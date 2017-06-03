@@ -2,6 +2,8 @@
 
 This is a piece for performer and laptop. It's written in SuperCollider.
 
+01, because everybody likes a leading zero.
+
 ## todos
 
 - [ ] incoming signal analysis
@@ -10,7 +12,8 @@ This is a piece for performer and laptop. It's written in SuperCollider.
 	- [ ] timbre
 	- [ ] other stuff?
 - [ ] patterns that "spawn" and evolve based on input
-- [ ] make the patterns non-repeating, ideally generative (Markov models)
+	- [ ] patterns changing _while_ playing
+	- [ ] make the patterns non-repeating, ideally generative (Markov models)
 - [ ] learn more about synthesis
 
 
