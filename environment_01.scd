@@ -47,7 +47,6 @@ SynthDef(\reson, {
 
 	sig = Resonz.ar(WhiteNoise.ar(1), freq, bwr: bwr, mul: 1/bwr);
 
-
 	sig = Pan2.ar(sig, pan, 1);
 	env = EnvGen.kr(Env.adsr(attackTime: 0.01, decayTime: 0.1, sustainLevel: 0.3, releaseTime:0.2), gate:gate, doneAction: 2);
 
@@ -59,7 +58,7 @@ SynthDef(\reson, {
 
 (
 // add `numpats` of EventStreamPlayers using `scale`
-~addemup = {|numpats, scale|
+~addemup = {|numpats, scale, rate=0.2|
 	numpats.do({
 		p = p.add(Pbind( // add pattern to Array p
 			\instrument, Pwrand([\klang, \reson], [0.8, 0.2], inf),
@@ -67,31 +66,40 @@ SynthDef(\reson, {
 			\root, Pwrand([ -24, -12, 0, 12, 17 ], [ 0.1, 0.2, 0.5, 0.2, 0.1 ], inf), // pick a root x semitones from middle C
 			\degree, Pwalk( // random walk up and down
 				(0..20), // list (of degrees to walk through)
-				Pwrand([-1,1, -3, 3],[0.3, 0.6, 0.6, 0.3], inf), // stepPattern (steps up and skips down are more likely)
+				Pwrand([-1,1, -3, 3, 6, -6],[0.3, 0.6, 0.6, 0.3, 0.1, 0.1], inf), // stepPattern (steps up and skips down are more likely)
 				1, // directionPattern (turn around at boundary)
 				0 // startPos
 			),
-			\dur, Pwrand(0.2 * [1, 2, 4, 5], [0.8, 0.1, 0.05, 0.05], inf),
+			\dur, Pwrand(rate * [1, 2, 4, 5], [0.8, 0.1, 0.05, 0.05], inf),
 			\legato, 1,
 			\pan, Pgauss(
 				mean: 0,
 				dev: 1,
 				length: inf),
-		).play;)
+			\bwr, Pgauss(mean: 0.1, dev: 1, length: inf),
+		).play(quant: 4);)
 	})
-}
+};
+
+// last in, first out
+~pattpop = {p[(p.size - 1)].stop; p.pop;};
+
+// first in, first out
+~pattretire = {p[0].stop; p.removeAt(0);};
+
 )
 
 // start up 1 or more streams
-~addemup.value(numpats: 3, scale: Scale.augmented);
+~addemup.value(numpats: 1, scale: Scale.augmented, rate: 0.1);
+
+// remove the most recent synth
+~pattpop.value
+
+// remove the oldest synth
+~pattretire.value
 
 // stop all streams and clear the array
-p.reverseDo({arg n, i; (p[i].stop)});
-
-
-x = { Resonz.ar(WhiteNoise.ar(0.5), 440, 0.05) }.scope(1);
-x.free
-
+p.reverseDo({arg n, i; (p[i].stop); p.pop});
 
 
 s.meter
