@@ -64,7 +64,7 @@ SynthDef(\reson, {
 		p = p.add(Pbind( // add pattern to Array p
 			\instrument, Pwrand([\klang, \reson], [0.8, 0.2], inf),
 			\scale, scale,
-			\root, Pwrand([-24, -12, 0, 12, 17], [0.1, 0.2, 0.5, 0. 2, 0.1], inf), // pick a root x semitones from middle C
+			\root, Pwrand([ -24, -12, 0, 12, 17 ], [ 0.1, 0.2, 0.5, 0.2, 0.1 ], inf), // pick a root x semitones from middle C
 			\degree, Pwalk( // random walk up and down
 				(0..20), // list (of degrees to walk through)
 				Pwrand([-1,1, -3, 3],[0.3, 0.6, 0.6, 0.3], inf), // stepPattern (steps up and skips down are more likely)
