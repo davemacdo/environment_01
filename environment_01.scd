@@ -42,8 +42,8 @@ SynthDef(\klang, {
 }).add;
 
 SynthDef(\reson, {
-	|freq=440, out=0, dur=0.5, pan = -1, gate=1|
-	var sig, env, bwr = 0.01;
+	|freq=440, out=0, dur=0.5, pan = -1, gate=1, bwr=0.01|
+	var sig, env;
 
 	sig = Resonz.ar(WhiteNoise.ar(1), freq, bwr: bwr, mul: 1/bwr);
 
@@ -57,11 +57,12 @@ SynthDef(\reson, {
 )
 
 (
+~scale = Array.new;
 // add `numpats` of EventStreamPlayers using `scale`
-~addemup = {|numpats, scale, rate=0.2|
+~addemup = {|numpats, scale, rate=0.2, synth=\klang, bwrval=0.01|
 	numpats.do({
-		p = p.add(Pbind( // add pattern to Array p
-			\instrument, Pwrand([\klang, \reson], [0.8, 0.2], inf),
+		p = p.add([Pbind( // add EventStreamPlayer to Array p
+			\instrument, synth,
 			\scale, scale,
 			\root, Pwrand([ -24, -12, 0, 12, 17 ], [ 0.1, 0.2, 0.5, 0.2, 0.1 ], inf), // pick a root x semitones from middle C
 			\degree, Pwalk( // random walk up and down
@@ -76,30 +77,45 @@ SynthDef(\reson, {
 				mean: 0,
 				dev: 1,
 				length: inf),
-			\bwr, Pgauss(mean: 0.1, dev: 1, length: inf),
-		).play(quant: 4);)
+			\bwr, bwrval,
+		).play(quant: 4),
+		scale.name,
+		rate,
+		synth,
+		bwrval
+		];)
 	})
 };
 
 // last in, first out
-~pattpop = {p[(p.size - 1)].stop; p.pop;};
+~pattpop = {p[(p.size - 1)][0].stop; p.pop;};
 
 // first in, first out
-~pattretire = {p[0].stop; p.removeAt(0);};
+~pattretire = {p[0][0].stop; p.removeAt(0);};
 
 )
 
 // start up 1 or more streams
-~addemup.value(numpats: 1, scale: Scale.augmented, rate: 0.1);
+~addemup.value(numpats: 4, scale: Scale.augmented, rate: 0.1, synth: \klang, bwrval: 0.3);
 
-// remove the most recent synth
+// remove the most recent stream
 ~pattpop.value
 
-// remove the oldest synth
+// remove the oldest stream
 ~pattretire.value
 
 // stop all streams and clear the array
-p.reverseDo({arg n, i; (p[i].stop); p.pop});
+~pattretire.dup(p.size);
+p.size
+
+( // QQQ: Why doesn't this loop remove _all_ matches in one go?
+p.do({arg item, i;
+	if (item[1] == "Augmented"){
+		item[0].stop;
+		p.removeAt(i);
+	}
+})
+)
 
 
 s.meter
