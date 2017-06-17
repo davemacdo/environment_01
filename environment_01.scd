@@ -25,7 +25,7 @@ y = Synth.new(\limiter);
 y = Synth.after(x, \limiter); // make sure the limiter is the LAST item on the node tree
 y.free;
 
-// SynthDef to test
+// SynthDefs
 (
 SynthDef(\klang, {
 	|freq=440, out=0, dur=0.5, pan = -1, gate=1|
@@ -57,7 +57,6 @@ SynthDef(\reson, {
 )
 
 (
-~scale = Array.new;
 // add `numpats` of EventStreamPlayers using `scale`
 ~addemup = {|numpats, scale, rate=0.2, synth=\klang, bwrval=0.01|
 	numpats.do({
@@ -96,7 +95,7 @@ SynthDef(\reson, {
 )
 
 // start up 1 or more streams
-~addemup.value(numpats: 4, scale: Scale.augmented, rate: 0.1, synth: \klang, bwrval: 0.3);
+~addemup.value(numpats: 8, scale: Scale.augmented, rate: 1, synth: \klang, bwrval: 0.3);
 
 // remove the most recent stream
 ~pattpop.value
