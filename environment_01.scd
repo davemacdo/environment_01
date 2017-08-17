@@ -95,7 +95,7 @@ SynthDef(\reson, {
 )
 
 // start up 1 or more streams
-~addemup.value(numpats: 8, scale: Scale.augmented, rate: 1, synth: \klang, bwrval: 0.3);
+~addemup.value(numpats: 8, scale: Scale.augmented, rate: 0.2, synth: \klang, bwrval: 0.3);
 
 // remove the most recent stream
 ~pattpop.value

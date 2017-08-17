@@ -61,7 +61,7 @@ p = Pbind(
     \degree, ~degree,
     \dur, ~dur,
 	\scale, ~scale,
-).play;
+).play(quant: 1);
 )
 
 Scale.directory
